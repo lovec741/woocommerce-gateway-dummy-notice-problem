@@ -134,17 +134,10 @@ class WC_Gateway_Dummy extends WC_Payment_Gateway {
 		$payment_result = $this->get_option( 'result' );
 
 		if ( 'success' === $payment_result ) {
-			$order = wc_get_order( $order_id );
-
-			$order->payment_complete();
-
-			// Remove cart
-			WC()->cart->empty_cart();
-
-			// Return thankyou redirect
+			wc_add_notice('TEST NOTICE', 'error');
 			return array(
 				'result' 	=> 'success',
-				'redirect'	=> $this->get_return_url( $order )
+				'redirect'	=> wc_get_checkout_url()
 			);
 		} else {
 			$message = __( 'Order payment failed. To make a successful payment using Dummy Payments, please review the gateway settings.', 'woocommerce-gateway-dummy' );
