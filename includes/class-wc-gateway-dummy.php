@@ -75,6 +75,8 @@ class WC_Gateway_Dummy extends WC_Payment_Gateway {
 		// Actions.
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_scheduled_subscription_payment_dummy', array( $this, 'process_subscription_payment' ), 10, 2 );
+
+		add_action( 'woocommerce_api_'.$this->id.'_reply', array( $this, 'webhook_reply' ) );
 	}
 
 	/**
@@ -134,10 +136,9 @@ class WC_Gateway_Dummy extends WC_Payment_Gateway {
 		$payment_result = $this->get_option( 'result' );
 
 		if ( 'success' === $payment_result ) {
-			wc_add_notice('TEST NOTICE', 'error');
 			return array(
 				'result' 	=> 'success',
-				'redirect'	=> wc_get_checkout_url()
+				'redirect'	=> home_url('?wc-api='.$this->id.'_reply')
 			);
 		} else {
 			$message = __( 'Order payment failed. To make a successful payment using Dummy Payments, please review the gateway settings.', 'woocommerce-gateway-dummy' );
@@ -161,5 +162,10 @@ class WC_Gateway_Dummy extends WC_Payment_Gateway {
 			$message = __( 'Order payment failed. To make a successful payment using Dummy Payments, please review the gateway settings.', 'woocommerce-gateway-dummy' );
 			throw new Exception( $message );
 		}
+	}
+
+	public function webhook_reply() {
+		wc_add_notice('TEST NOTICE', 'error');
+		wp_redirect(wc_get_checkout_url());
 	}
 }
